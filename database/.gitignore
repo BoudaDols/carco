@@ -27,5 +27,6 @@ Homestead.json
 /storage/pail
 .env.backup
 .env.production
+.env.encrypted
 .phpactor.json
 auth.json
