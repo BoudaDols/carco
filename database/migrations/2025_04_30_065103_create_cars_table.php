@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('price');
             $table->string('description');
             $table->string('color');
+            $table->string('chassisNumber');
             $table->unsignedBigInteger('categorie_id');
             $table->unsignedBigInteger('brand_id');
             $table->timestamps();
