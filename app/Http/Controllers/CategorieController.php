@@ -8,8 +8,7 @@ use App\Models\Categorie;
 
 class CategorieController extends Controller
 {
-    public function addCategorie(Request $request)
-    {
+    public function addCategorie(Request $request){
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:categories|max:255',
         ]);
@@ -17,9 +16,6 @@ class CategorieController extends Controller
         if($validator->fails()){
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        // if(Categorie::where('name', $request->input('name'))->exists()){
-        //     return response()->json(['errors' => 'Categorie already exists'], 422);
-        // }
 
 
         $categorie = new Categorie();

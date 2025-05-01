@@ -8,8 +8,7 @@ use App\Models\Car;
 
 class CarController extends Controller
 {
-    public function addCar(Request $request)
-    {
+    public function addCar(Request $request){
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'year' => 'required|integer|between:1900,' . date('Y'),
@@ -26,9 +25,6 @@ class CarController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // if(Car::where('chassisNumber', $request->input('chassisNumber'))->exists()){
-        //     return response()->json(['message' => 'Car already exists'], 422);
-        // }
         
         $car = new Car();
         $car->name = $request->input('name');
