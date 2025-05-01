@@ -17,11 +17,17 @@ class CarController extends Controller
             'price' => 'required|numeric|min:0',
             'chassisNumber'=> 'required|string|max:32',
             'description' => 'required|string|max:255',
+            'categorie_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id'
         ]);
 
 
         if($validator->fails()){
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if(Car::where('chassisNumber', $request->input('chassisNumber'))->exists()){
+            return response()->json(['message' => 'Car already exists'], 422);
         }
         
         $car = new Car();
@@ -31,6 +37,8 @@ class CarController extends Controller
         $car->price = $request->input('price');
         $car->chassisNumber = $request->input('chassisNumber');
         $car->description = $request->input('description');
+        $car->categorie_id = $request->input('categorie_id');
+        $car->brand_id = $request->input('brand_id');
         $car->save();
         return response()->json(['message' => 'Car added successfully'], 201);
     }

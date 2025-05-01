@@ -3,15 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Categorie extends Model
 {
-    public $name;
-
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
+    use HasFactory;
 
     public function cars() : HasMany
     {
