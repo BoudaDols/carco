@@ -15,7 +15,7 @@ class CarController extends Controller
             'year' => 'required|integer|between:1900,' . date('Y'),
             'color'=> 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'chassisNumber'=> 'required|string|max:32',
+            'chassisNumber'=> 'required|unique:cars|max:32',
             'description' => 'required|string|max:255',
             'categorie_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id'
@@ -26,9 +26,9 @@ class CarController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if(Car::where('chassisNumber', $request->input('chassisNumber'))->exists()){
-            return response()->json(['message' => 'Car already exists'], 422);
-        }
+        // if(Car::where('chassisNumber', $request->input('chassisNumber'))->exists()){
+        //     return response()->json(['message' => 'Car already exists'], 422);
+        // }
         
         $car = new Car();
         $car->name = $request->input('name');

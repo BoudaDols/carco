@@ -17,9 +17,9 @@ class BrandController extends Controller
         if($validator->fails()){
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        if(Brand::where('name', $request->name)->exists()){
-            return response()->json(['errors' => 'Brand already exists'], 422);
-        }
+        // if(Brand::where('name', $request->name)->exists()){
+        //     return response()->json(['errors' => 'Brand already exists'], 422);
+        // }
 
         $brand = new Brand();
         $brand->name = $request->name;
