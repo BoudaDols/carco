@@ -38,7 +38,7 @@ class CategorieController extends Controller
     /*
     * Get a categorie by id
     */
-    public function getCategorie($id){
+    public function getCategorieById($id){
         $categorie = Categorie::find($id);
         if($categorie){
             return response()->json($categorie, 200);

@@ -51,7 +51,7 @@ class CarController extends Controller
     *   @param Request $request
     *   @return Response
     */
-    public function getCar(Request $request){
+    public function getCarById(Request $request){
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:cars,id'
         ]);
