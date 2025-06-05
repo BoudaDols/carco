@@ -66,6 +66,10 @@ class CarController extends Controller
     */
     public function getCars(){
         $cars = Car::all();
+        foreach($cars as $car){
+            $car->categorie_id = $car->categorie->name;
+            $car->brand_id = $car->brand->name;
+        }
         return response()->json($cars);
     }
 
