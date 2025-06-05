@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Brand;
+use App\Models\Car;
 use Illuminate\Support\Facades\Validator;
 
 class BrandController extends Controller
@@ -70,5 +71,23 @@ class BrandController extends Controller
         }
         $brand->delete();
         return response()->json(['message' => 'Brand deleted successfully'], 200);
+    }
+
+    /*
+    *  Returns Car list by the given brand
+    */
+    public function getCarsByBrand(Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|exists:brands|max:255',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $brand = Brand::where('name', $request->name)->first();
+        $cars = Car::where('brand_id', $brand->id)->get();
+
+        return response()->json($cars, 200);
     }
 }

@@ -14,7 +14,7 @@ Route::get('/', function(){
 });
 
 Route::post('/car/create', [CarController::class, 'addCar']);
-Route::get('/car', [CarController::class, 'getCars']);
+Route::get('/cars', [CarController::class, 'getCars']);
 Route::get('/car/{id}', [CarController::class, 'getCarById']);
 Route::put('/car/{id}', [CarController::class, 'updateCar']);
 Route::delete('/car/{id}', [CarController::class, 'deleteCar']);
@@ -22,15 +22,17 @@ Route::delete('/car/{id}', [CarController::class, 'deleteCar']);
 
 
 Route::post('/categorie/create', [CategorieController::class, 'addCategorie']);
-Route::get('/categorie', [CategorieController::class, 'getCategories']);
+Route::get('/categories', [CategorieController::class, 'getCategories']);
 Route::get('/categorie/{id}', [CategorieController::class, 'getCategorieById']);
 Route::put('/categorie/{id}', [CategorieController::class, 'updateCategorie']);
 Route::delete('/categorie/{id}', [CategorieController::class, 'deleteCategorie']);
+Route::get('/categories/cars', [CategorieController::class, 'getCarsByCategorie']);
 
 
 
 Route::post('/brand/create', [BrandController::class, 'addBrand']);
-Route::get('/brand', [BrandController::class, 'getBrands']);
+Route::get('/brands', [BrandController::class, 'getBrands']);
 Route::get('/brand/{id}', [BrandController::class, 'getBrandById']);
 Route::put('/brand/{id}', [BrandController::class, 'updateBrand']);
 Route::delete('/brand/{id}', [BrandController::class, 'deleteBrand']);
+Route::get('/brands/cars', [BrandController::class, 'getCarsByBrand']);

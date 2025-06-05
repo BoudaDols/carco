@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Categorie;
+use App\Models\Car;
 
 class CategorieController extends Controller
 {
@@ -80,5 +81,23 @@ class CategorieController extends Controller
         }else{
             return response()->json(['message' => 'Categorie not found'], 404);
         }
+    }
+
+    /*
+    *  Returns Car list by the given categorie
+    */
+    public function getCarsByCategorie(Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|exists:categories|max:255',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $categorie = Categorie::where('name', $request->name)->first();
+        $cars = Car::where('categorie_id', $categorie->id)->get();
+
+        return response()->json($cars, 200);
     }
 }
