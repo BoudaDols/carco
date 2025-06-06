@@ -42,7 +42,7 @@ class CarController extends Controller
         $car->categorie_id = $request->input('categorie_id');
         $car->brand_id = $request->input('brand_id');
         $car->save();
-        return response()->json(['message' => 'Car added successfully'], 201);
+        return response()->json(['message' => 'Car added successfully'], 200);
     }
 
 
@@ -57,6 +57,10 @@ class CarController extends Controller
         ]);
 
         $car = Car::find($request->input('id'));
+        $car->categorie_id = $car->categorie->name;
+        $car->brand_id = $car->brand->name;
+
+        return response()->json($car, 200);
     }
 
 
@@ -70,7 +74,7 @@ class CarController extends Controller
             $car->categorie_id = $car->categorie->name;
             $car->brand_id = $car->brand->name;
         }
-        return response()->json($cars);
+        return response()->json($cars, 200);
     }
 
 
@@ -106,7 +110,7 @@ class CarController extends Controller
         $car->categorie_id = $request->input('categorie_id');
         $car->brand_id = $request->input('brand_id');
         $car->save();
-        return response()->json(['message' => 'Car updated successfully'], 201);
+        return response()->json(['message' => 'Car updated successfully'], 200);
     }
 
 
@@ -122,6 +126,6 @@ class CarController extends Controller
 
         $car = Car::find($request->input('id'));
         $car->delete();
-        return response()->json(['message' => 'Car deleted successfully'], 201);
+        return response()->json(['message' => 'Car deleted successfully'], 200);
     }
 }
