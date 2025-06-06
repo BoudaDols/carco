@@ -96,7 +96,12 @@ class CategorieController extends Controller
         }
 
         $categorie = Categorie::where('name', $request->name)->first();
-        $cars = Car::where('categorie_id', $categorie->id)->get();
+        $cars = $categorie->cars;
+
+        foreach($cars as $car){
+            $car->categorie_id = $car->categorie->name;
+            $car->brand_id = $car->brand->name;
+        }
 
         return response()->json($cars, 200);
     }

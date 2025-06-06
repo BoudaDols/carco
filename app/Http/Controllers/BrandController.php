@@ -86,7 +86,12 @@ class BrandController extends Controller
         }
 
         $brand = Brand::where('name', $request->name)->first();
-        $cars = Car::where('brand_id', $brand->id)->get();
+        $cars = $brand->cars;
+
+        foreach($cars as $car){
+            $car->categorie_id = $car->categorie->name;
+            $car->brand_id = $car->brand->name;
+        }
 
         return response()->json($cars, 200);
     }
