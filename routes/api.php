@@ -18,6 +18,7 @@ Route::get('/cars', [CarController::class, 'getCars']);
 Route::get('/car/{id}', [CarController::class, 'getCarById']);
 Route::put('/car/{id}', [CarController::class, 'updateCar']);
 Route::delete('/car/{id}', [CarController::class, 'deleteCar']);
+Route::get('/cars/search', [CarController::class, 'getCarByName']);
 
 
 

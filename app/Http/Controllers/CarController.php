@@ -128,4 +128,28 @@ class CarController extends Controller
         $car->delete();
         return response()->json(['message' => 'Car deleted successfully'], 200);
     }
+
+    /*
+    *   Get car list by name
+    *   @param Request $request
+    *   @return Response
+    */
+    public function getCarByName(Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $cars = Car::where('name', 'like', '%' . $request->input('name') . '%')->get();
+
+        foreach($cars as $car){
+            $car->categorie_id = $car->categorie->name;
+            $car->brand_id = $car->brand->name;
+        }
+
+        return response()->json($cars, 200);
+    }
 }
