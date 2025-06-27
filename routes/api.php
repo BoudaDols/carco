@@ -5,6 +5,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\BrandController;
+use Laravel\Passport\Http\Controllers\AccessTokenController;
+use Laravel\Passport\Http\Controllers\TransientTokenController;
+use Laravel\Passport\Http\Controllers\AuthorizationController;
+use Laravel\Passport\Http\Controllers\ApproveAuthorizationController;
+use Laravel\Passport\Http\Controllers\DenyAuthorizationController;
+
+
+
+Route::post('/oauth/token', [AccessTokenController::class, 'issueToken'])
+    ->middleware(['throttle']);
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/oauth/authorize', [AuthorizationController::class, 'authorize']);
+    Route::post('/oauth/authorize', [ApproveAuthorizationController::class, 'approve']);
+    Route::delete('/oauth/authorize', [DenyAuthorizationController::class, 'deny']);
+});
+
+Route::middleware('auth')->get('/oauth/token/refresh', [TransientTokenController::class, 'refresh']);
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
