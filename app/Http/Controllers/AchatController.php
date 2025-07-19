@@ -108,4 +108,54 @@ class AchatController extends Controller
         $achats = Achat::where('car_id', $request->input('car_id'))->get();
         return response()->json($achats);
     }
+
+
+    /*
+    *
+    *   Update achat
+    *   @param Request $request
+    *   @return Response
+    *
+    */
+    public function updateAchat(Request $request){
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:achats,id',
+            'car_id' => 'required|exists:cars,id',
+            'client_id' => 'required|exists:clients,id'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $achat = Achat::find($request->input('id'));
+        $achat->car_id = $request->input('car_id');
+        $achat->client_id = $request->input('client_id');
+        $achat->save();
+
+        return response()->json(['message' => 'Achat updated successfully'], 200);
+    }
+
+
+    /*
+    *
+    *   Delete achat
+    *   @param Request $request
+    *   @return Response
+    *
+    */
+    public function deleteAchat(Request $request){
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:achats,id'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $achat = Achat::find($request->input('id'));
+        $achat->delete();
+
+        return response()->json(['message' => 'Achat deleted successfully'], 200);
+    }
 }
