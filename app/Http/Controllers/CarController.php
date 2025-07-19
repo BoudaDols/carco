@@ -55,6 +55,10 @@ class CarController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:cars,id'
         ]);
+        
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         $car = Car::find($request->input('id'));
         $car->categorie_id = $car->categorie->name;
