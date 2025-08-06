@@ -23,17 +23,17 @@ return new class extends Migration
             $table->unsignedBigInteger('brand_id');
             $table->timestamps();
 
-            //Declaration de clés etrangères avec Categorie
+            // Declaration de clés etrangères avec Categorie
             $table->foreign('categorie_id')
-                    ->references('id')
-                    ->on('categories')
-                    ->onDelete('cascade');
+                ->references('id')
+                ->on('categories')
+                ->onDelete('cascade');
 
-            //Declaration de clés etrangères avec Model
+            // Declaration de clés etrangères avec Model
             $table->foreign('brand_id')
-                    ->references('id')
-                    ->on('brands')
-                    ->onDelete('cascade');
+                ->references('id')
+                ->on('brands')
+                ->onDelete('cascade');
         });
     }
 
