@@ -2,107 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\CategorieRequest;
 use App\Models\Categorie;
-use App\Models\Car;
 
 class CategorieController extends Controller
 {
-    /*
-    * Add a new categorie
-    */
-    public function addCategorie(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:categories|max:255',
-        ]);
+    public function addCategorie(CategorieRequest $request)
+    {
+        $categorie = Categorie::create($request->validated());
 
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-
-        $categorie = new Categorie();
-        $categorie->name = $request->input('name');
-        $categorie->save();
         return response()->json($categorie, 201);
     }
 
-    /*
-    * Get all categories
-    */
-    public function getCategories(){
-        $categories = Categorie::all();
-        return response()->json($categories, 200);
+    public function getCategories()
+    {
+        return response()->json(Categorie::all());
     }
 
-    /*
-    * Get a categorie by id
-    */
-    public function getCategorieById($id){
-        $categorie = Categorie::find($id);
-        if($categorie){
-            return response()->json($categorie, 200);
-        }else{
-            return response()->json(['message' => 'Categorie not found'], 404);
-        }
+    public function getCategorieById(Categorie $categorie)
+    {
+        return response()->json($categorie);
     }
 
-    /*
-    * Update a categorie
-    */
-    public function updateCategorie(Request $request, $id){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:categories|max:255',
-        ]);
+    public function updateCategorie(CategorieRequest $request, Categorie $categorie)
+    {
+        $categorie->update($request->validated());
 
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $categorie = Categorie::find($id);
-        if($categorie){
-            $categorie->name = $request->input('name');
-            $categorie->save();
-            return response()->json($categorie, 200);
-        }else{
-            return response()->json(['message' => 'Categorie not found'], 404);
-        }
+        return response()->json($categorie);
     }
 
-    /*
-    * Delete a categorie
-    */
-    public function deleteCategorie($id){
-        $categorie = Categorie::find($id);
-        if($categorie){
-            $categorie->delete();
-            return response()->json(['message' => 'Categorie deleted'], 200);
-        }else{
-            return response()->json(['message' => 'Categorie not found'], 404);
-        }
+    public function deleteCategorie(Categorie $categorie)
+    {
+        $categorie->delete();
+
+        return response()->json(null, 204);
     }
 
-    /*
-    *  Returns Car list by the given categorie
-    */
-    public function getCarsByCategorie(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|exists:categories|max:255',
-        ]);
+    public function getCarsByCategorie(Categorie $categorie)
+    {
+        $cars = $categorie->cars()->with(['brand', 'category'])->get();
 
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $categorie = Categorie::where('name', $request->name)->first();
-        $cars = $categorie->cars;
-
-        foreach($cars as $car){
-            $car->categorie_id = $car->categorie->name;
-            $car->brand_id = $car->brand->name;
-        }
-
-        return response()->json($cars, 200);
+        return response()->json($cars);
     }
 }
