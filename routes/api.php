@@ -1,16 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CategorieController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\AuthController;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-
-
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -23,33 +17,39 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+Route::post('/car', [CarController::class, 'addCar']);
+Route::get('/cars', [CarController::class, 'getCars']);
+Route::get('/car/{car}', [CarController::class, 'getCarById']);
+Route::put('/car/{car}', [CarController::class, 'updateCar']);
+Route::delete('/car/{car}', [CarController::class, 'deleteCar']);
+Route::get('/cars/search', [CarController::class, 'getCarByName']);
 
-        Route::post('/car/create', [CarController::class, 'addCar']);
-        Route::get('/cars', [CarController::class, 'getCars']);
-        Route::get('/car/{id}', [CarController::class, 'getCarById']);
-        Route::put('/car/{id}', [CarController::class, 'updateCar']);
-        Route::delete('/car/{id}', [CarController::class, 'deleteCar']);
-        Route::get('/cars/search', [CarController::class, 'getCarByName']);
+Route::post('/categorie/create', [CategorieController::class, 'addCategorie']);
+Route::get('/categories', [CategorieController::class, 'getCategories']);
+Route::get('/categorie/{id}', [CategorieController::class, 'getCategorieById']);
+Route::put('/categorie/{id}', [CategorieController::class, 'updateCategorie']);
+Route::delete('/categorie/{id}', [CategorieController::class, 'deleteCategorie']);
+Route::get('/categories/cars', [CategorieController::class, 'getCarsByCategorie']);
 
+Route::post('/brand/create', [BrandController::class, 'addBrand']);
+Route::get('/brands', [BrandController::class, 'getBrands']);
+Route::get('/brand/{id}', [BrandController::class, 'getBrandById']);
+Route::put('/brand/{id}', [BrandController::class, 'updateBrand']);
+Route::delete('/brand/{id}', [BrandController::class, 'deleteBrand']);
+Route::get('/brands/cars', [BrandController::class, 'getCarsByBrand']);
 
+Route::post('/achat', [AchatController::class, 'addAchat']);
+Route::get('/achats', [AchatController::class, 'getAchats']);
+Route::get('/achat/{achat}', [AchatController::class, 'getAchatById']);
+Route::put('/achat/{achat}', [AchatController::class, 'updateAchat']);
+Route::delete('/achat/{achat}', [AchatController::class, 'deleteAchat']);
 
-        Route::post('/categorie/create', [CategorieController::class, 'addCategorie']);
-        Route::get('/categories', [CategorieController::class, 'getCategories']);
-        Route::get('/categorie/{id}', [CategorieController::class, 'getCategorieById']);
-        Route::put('/categorie/{id}', [CategorieController::class, 'updateCategorie']);
-        Route::delete('/categorie/{id}', [CategorieController::class, 'deleteCategorie']);
-        Route::get('/categories/cars', [CategorieController::class, 'getCarsByCategorie']);
+Route::post('/client', [ClientController::class, 'addClient']);
+Route::get('/clients', [ClientController::class, 'getClients']);
+Route::get('/client/{client}', [ClientController::class, 'getClientById']);
+Route::put('/client/{client}', [ClientController::class, 'updateClient']);
+Route::delete('/client/{client}', [ClientController::class, 'deleteClient']);
 
-
-
-        Route::post('/brand/create', [BrandController::class, 'addBrand']);
-        Route::get('/brands', [BrandController::class, 'getBrands']);
-        Route::get('/brand/{id}', [BrandController::class, 'getBrandById']);
-        Route::put('/brand/{id}', [BrandController::class, 'updateBrand']);
-        Route::delete('/brand/{id}', [BrandController::class, 'deleteBrand']);
-        Route::get('/brands/cars', [BrandController::class, 'getCarsByBrand']);
-
-Route::get('/', function(){
+Route::get('/', function () {
     return response()->json(['message' => 'Welcome to the API CarCo!']);
 });
-
