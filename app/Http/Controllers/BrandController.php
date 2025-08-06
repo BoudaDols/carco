@@ -2,97 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\BrandRequest;
 use App\Models\Brand;
-use App\Models\Car;
-use Illuminate\Support\Facades\Validator;
 
 class BrandController extends Controller
 {
-    /*
-    *   Get all brands
-    */
-    public function getBrands(){
-        $brands = Brand::all();
-        return response()->json($brands);
-    }
+    public function addBrand(BrandRequest $request)
+    {
+        $brand = Brand::create($request->validated());
 
-    /*
-    *   Add a new brand
-    */
-    public function addBrand(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:brands|max:255',
-            'origin' => 'required|string|max:255',
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-        
-
-        $brand = new Brand();
-        $brand->name = $request->name;
-        $brand->origin = $request->origin;
-        $brand->save();
         return response()->json($brand, 201);
     }
 
-    /*
-    *   Update a brand
-    */
-    public function updateBrand(Request $request, $id){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:brands|max:255',
-            'origin' => 'required|string|max:255',
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $brand = Brand::find($id);
-        if(!$brand){
-            return response()->json(['message' => 'Brand not found'], 404);
-        }
-        $brand->name = $request->name;
-        $brand->origin = $request->origin;
-        $brand->save();
-        return response()->json($brand, 200);
+    public function getBrands()
+    {
+        return response()->json(Brand::all());
     }
 
-    /*
-    *   Delete a brand
-    */
-    public function deleteBrand($id){
-        $brand = Brand::find($id);
-        if(!$brand){
-            return response()->json(['message' => 'Brand not found'], 404);
-        }
+    public function getBrandById(Brand $brand)
+    {
+        return response()->json($brand);
+    }
+
+    public function updateBrand(BrandRequest $request, Brand $brand)
+    {
+        $brand->update($request->validated());
+
+        return response()->json($brand);
+    }
+
+    public function deleteBrand(Brand $brand)
+    {
         $brand->delete();
-        return response()->json(['message' => 'Brand deleted successfully'], 200);
+
+        return response()->json(null, 204);
     }
 
-    /*
-    *  Returns Car list by the given brand
-    */
-    public function getCarsByBrand(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|exists:brands|max:255',
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $brand = Brand::where('name', $request->name)->first();
-        $cars = $brand->cars;
-
-        foreach($cars as $car){
-            $car->categorie_id = $car->categorie->name;
-            $car->brand_id = $car->brand->name;
-        }
-
-        return response()->json($cars, 200);
+    public function getCarsByBrand(Brand $brand)
+    {
+        return response()->json($brand->cars);
     }
 }
