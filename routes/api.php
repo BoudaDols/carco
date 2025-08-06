@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\AchatController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CategorieController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,26 +19,31 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::post('/car', [CarController::class, 'addCar']);
-Route::get('/cars', [CarController::class, 'getCars']);
-Route::get('/car/{car}', [CarController::class, 'getCarById']);
-Route::put('/car/{car}', [CarController::class, 'updateCar']);
-Route::delete('/car/{car}', [CarController::class, 'deleteCar']);
-Route::get('/cars/search', [CarController::class, 'getCarByName']);
+Route::prefix('cars')->group(function () {
+    Route::post('/', [CarController::class, 'addCar']);
+    Route::get('/', [CarController::class, 'getCars']);
+    Route::get('/{car}', [CarController::class, 'getCarById']);
+    Route::put('/{car}', [CarController::class, 'updateCar']);
+    Route::delete('/{car}', [CarController::class, 'deleteCar']);
+});
 
-Route::post('/categorie/create', [CategorieController::class, 'addCategorie']);
-Route::get('/categories', [CategorieController::class, 'getCategories']);
-Route::get('/categorie/{id}', [CategorieController::class, 'getCategorieById']);
-Route::put('/categorie/{id}', [CategorieController::class, 'updateCategorie']);
-Route::delete('/categorie/{id}', [CategorieController::class, 'deleteCategorie']);
-Route::get('/categories/cars', [CategorieController::class, 'getCarsByCategorie']);
+Route::prefix('categories')->group(function () {
+    Route::post('/', [CategorieController::class, 'addCategorie']);
+    Route::get('/', [CategorieController::class, 'getCategories']);
+    Route::get('/{categorie}', [CategorieController::class, 'getCategorieById']);
+    Route::put('/{categorie}', [CategorieController::class, 'updateCategorie']);
+    Route::delete('/{categorie}', [CategorieController::class, 'deleteCategorie']);
+    Route::get('/{categorie}/cars', [CategorieController::class, 'getCarsByCategorie']);
+});
 
-Route::post('/brand/create', [BrandController::class, 'addBrand']);
-Route::get('/brands', [BrandController::class, 'getBrands']);
-Route::get('/brand/{id}', [BrandController::class, 'getBrandById']);
-Route::put('/brand/{id}', [BrandController::class, 'updateBrand']);
-Route::delete('/brand/{id}', [BrandController::class, 'deleteBrand']);
-Route::get('/brands/cars', [BrandController::class, 'getCarsByBrand']);
+Route::prefix('brands')->group(function () {
+    Route::post('/', [BrandController::class, 'addBrand']);
+    Route::get('/', [BrandController::class, 'getBrands']);
+    Route::get('/{brand}', [BrandController::class, 'getBrandById']);
+    Route::put('/{brand}', [BrandController::class, 'updateBrand']);
+    Route::delete('/{brand}', [BrandController::class, 'deleteBrand']);
+    Route::get('/{brand}/cars', [BrandController::class, 'getCarsByBrand']);
+});
 
 Route::post('/achat', [AchatController::class, 'addAchat']);
 Route::get('/achats', [AchatController::class, 'getAchats']);

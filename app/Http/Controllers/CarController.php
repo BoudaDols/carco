@@ -23,12 +23,12 @@ class CarController extends Controller
             $query->where('name', 'like', '%' . $request->input('name') . '%');
         }
 
-        return response()->json($query->get());
+        return response()->json($query->with(['brand', 'category'])->get());
     }
 
     public function getCarById(Car $car)
     {
-        return response()->json($car);
+        return response()->json($car->load(['brand', 'category']));
     }
 
     public function updateCar(CarRequest $request, Car $car)

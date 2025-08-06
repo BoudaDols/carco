@@ -40,6 +40,8 @@ class BrandController extends Controller
 
     public function getCarsByBrand(Brand $brand)
     {
-        return response()->json($brand->cars);
+        $cars = $brand->cars()->with(['brand', 'category'])->get();
+
+        return response()->json($cars);
     }
 }
