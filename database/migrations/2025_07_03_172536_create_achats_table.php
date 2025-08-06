@@ -17,19 +17,17 @@ return new class extends Migration
             $table->unsignedBigInteger('client_id');
             $table->timestamps();
 
-
-            //Declaration de clés etrangères avec Car
+            // Declaration de clés etrangères avec Car
             $table->foreign('car_id')
-                    ->references('id')
-                    ->on('cars')
-                    ->onDelete('cascade');
+                ->references('id')
+                ->on('cars')
+                ->onDelete('cascade');
 
-
-            //Declaration de clés etrangères avec Client
+            // Declaration de clés etrangères avec Client
             $table->foreign('client_id')
-                    ->references('id')
-                    ->on('clients')
-                    ->onDelete('cascade');
+                ->references('id')
+                ->on('clients')
+                ->onDelete('cascade');
         });
     }
 
