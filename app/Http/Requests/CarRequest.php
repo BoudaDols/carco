@@ -24,8 +24,10 @@ class CarRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'color' => 'required|string|max:255',
+            'chassisNumber' => 'required|string|max:255|unique:cars,chassisNumber,' . $this->car->id,
             'price' => 'required|numeric',
-            'image' => 'required|string',
+            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'brand_id' => 'required|exists:brands,id',
             'category_id' => 'required|exists:categories,id',
         ];

@@ -21,7 +21,12 @@ class AuthController extends Controller
             'active' => true,
         ]);
 
-        return response()->json(['message' => 'Utilisateur créé avec succès.'], 201);
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ], 201);
     }
 
     // Connexion
@@ -49,6 +54,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Déconnexion réussie.']);
+        
     }
 
     // Données utilisateur connecté

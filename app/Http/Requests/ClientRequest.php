@@ -24,7 +24,9 @@ class ClientRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:clients,email,' . $this->client?->id,
-            'phone' => 'required|string|max:20',
+            'dateNaissance' => 'required|date',
+            'sexe' => 'required|string|max:255',
+            'domaineP' => 'required|string|max:255',
         ];
     }
 }

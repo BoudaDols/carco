@@ -35,7 +35,7 @@ class BrandController extends Controller
     {
         $brand->delete();
 
-        return response()->json(null, 204);
+        return response()->json(null, 200);
     }
 
     public function getCarsByBrand(Brand $brand)
