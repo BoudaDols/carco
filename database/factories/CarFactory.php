@@ -27,8 +27,6 @@ class CarFactory extends Factory
             'chassisNumber' => $this->faker->unique()->text(10),
             'brand_id' => Brand::factory(),
             'categorie_id' => Categorie::factory(),
-            'brand_id' => Brand::factory(),
-            'categorie_id' => Categorie::factory(),
         ];
     }
 }

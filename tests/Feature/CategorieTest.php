@@ -85,8 +85,11 @@ class CategorieTest extends TestCase
     {
         $categorie = Categorie::factory()->create();
         Car::factory()->count(3)->create(['categorie_id' => $categorie->id]);
+        $data = [
+            'name' => $categorie->name,
+        ];
 
-        $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/auth/categories/{$categorie->id}/cars");
+        $response = $this->actingAs($this->user, 'sanctum')->getJson("/api/auth/categories/{$categorie->name}/cars", $data);
 
         $response->assertStatus(200)
             ->assertJsonCount(3);

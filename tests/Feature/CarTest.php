@@ -30,7 +30,9 @@ class CarTest extends TestCase
             'name' => 'Test Car',
             'description' => 'This is a test car.',
             'price' => 10000,
-            'image' => 'test.jpg',
+            'color' => 'Red',
+            'chassisNumber' => 'ABC123',
+            'year' => 2023,
             'brand_id' => $brand->id,
             'categorie_id' => $categorie->id,
         ];

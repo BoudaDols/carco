@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategorieRequest;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use App\Models\Categorie;
 
 class CategorieController extends Controller
@@ -38,10 +40,24 @@ class CategorieController extends Controller
         return response()->json(null, 204);
     }
 
-    public function getCarsByCategorie(Categorie $categorie)
+    public function getCarsByCategorie(Request $request)
     {
-        $cars = $categorie->cars()->with(['brand', 'category'])->get();
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|exists:categories|max:255',
+        ]);
 
-        return response()->json($cars);
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $categorie = Categorie::where('name', $request->name)->first();
+        $cars = $categorie->cars;
+
+        foreach($cars as $car){
+            $car->categorie_id = $car->categorie->name;
+            $car->brand_id = $car->brand->name;
+        }
+
+        return response()->json($cars, 200);
     }
 }

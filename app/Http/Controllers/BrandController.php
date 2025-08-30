@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BrandRequest;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 use App\Models\Brand;
 
 class BrandController extends Controller
@@ -38,10 +40,24 @@ class BrandController extends Controller
         return response()->json(null, 200);
     }
 
-    public function getCarsByBrand(Brand $brand)
+    public function getCarsByBrand(Request $request)
     {
-        $cars = $brand->cars()->with(['brand', 'category'])->get();
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|exists:brands|max:255',
+        ]);
 
-        return response()->json($cars);
+        if($validator->fails()){
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $brand = Brand::where('name', $request->name)->first();
+        $cars = $brand->cars;
+
+        foreach($cars as $car){
+            $car->categorie_id = $car->categorie->name;
+            $car->brand_id = $car->brand->name;
+        }
+
+        return response()->json($cars, 200);
     }
 }

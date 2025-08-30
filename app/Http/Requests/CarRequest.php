@@ -29,7 +29,7 @@ class CarRequest extends FormRequest
             'price' => 'required|numeric',
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'brand_id' => 'required|exists:brands,id',
-            'category_id' => 'required|exists:categories,id',
+            'categorie_id' => 'required|exists:categories,id',
         ];
     }
 }
