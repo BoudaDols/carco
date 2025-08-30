@@ -10,6 +10,9 @@ class Categorie extends Model
 {
     use HasFactory;
 
+
+    protected $fillable = ['name'];
+
     public function cars(): HasMany
     {
         return $this->hasMany(Car::class);

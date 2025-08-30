@@ -61,6 +61,7 @@ class BrandTest extends TestCase
 
         $updatedData = [
             'name' => 'Updated Brand Name',
+            'origin' => 'Updated Origin'
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson("/api/auth/brands/{$brand->id}", $updatedData);

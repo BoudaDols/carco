@@ -63,6 +63,9 @@ class ClientTest extends TestCase
 
         $updatedData = [
             'name' => 'Updated Client Name',
+            'dateNaissance' => $this->faker->date(),
+            'sexe' => 'F',
+            'domaineP' => 'Updated Domain',
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson("/api/auth/client/{$client->id}", $updatedData);

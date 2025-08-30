@@ -70,6 +70,12 @@ class CarTest extends TestCase
         $updatedData = [
             'name' => 'Updated Car Name',
             'price' => 15000,
+            'description' => 'Updated car description',
+            'color' => 'Blue',
+            'chassisNumber' => 'ABC123',
+            'year' => 2022,
+            'brand_id' => $car->brand_id,
+            'categorie_id' => $car->categorie_id,
         ];
 
         $response = $this->actingAs($this->user, 'sanctum')->putJson("/api/auth/cars/{$car->id}", $updatedData);
