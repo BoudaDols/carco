@@ -8,152 +8,143 @@ use App\Models\Car;
 
 class CarController extends Controller
 {
+    private const CAR_FIELDS = [
+        'name', 'year', 'color', 'price', 
+        'chassisNumber', 'description', 
+        'categorie_id', 'brand_id'
+    ];
 
-    /*
-    *   Add a new car
-    *   @param Request $request
-    *   @return Response
-    */
-    public function addCar(Request $request){
-        $validator = Validator::make($request->all(), [
+    private function getCarValidationRules($carId = null): array
+    {
+        $uniqueRule = $carId ? "unique:cars,chassisNumber,{$carId}" : 'unique:cars';
+        
+        return [
             'name' => 'required|string|max:255',
             'year' => 'required|integer|between:1900,' . date('Y'),
-            'color'=> 'required|string|max:255',
+            'color' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'chassisNumber'=> 'required|unique:cars|max:32',
+            'chassisNumber' => "required|{$uniqueRule}|max:32",
             'description' => 'required|string|max:255',
             'categorie_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id'
-        ]);
+        ];
+    }
 
+    public function addCar(Request $request)
+    {
+        $validator = Validator::make($request->all(), $this->getCarValidationRules());
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        try {
+            Car::create($request->only(self::CAR_FIELDS));
+            return response()->json(['message' => 'Car added successfully'], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create car'], 500);
+        }
+    }
+
+    
+    public function getCarById($id)
+    {
+        $car = Car::with(['categorie', 'brand'])->findOrFail($id);
         
-        $car = new Car();
-        $car->name = $request->input('name');
-        $car->year = $request->input('year');
-        $car->color = $request->input('color');
-        $car->price = $request->input('price');
-        $car->chassisNumber = $request->input('chassisNumber');
-        $car->description = $request->input('description');
-        $car->categorie_id = $request->input('categorie_id');
-        $car->brand_id = $request->input('brand_id');
-        $car->save();
-        return response()->json(['message' => 'Car added successfully'], 200);
+        return response()->json([
+            'id' => $car->id,
+            'name' => $car->name,
+            'year' => $car->year,
+            'color' => $car->color,
+            'price' => $car->price,
+            'chassisNumber' => $car->chassisNumber,
+            'description' => $car->description,
+            'category' => $car->categorie->name,
+            'brand' => $car->brand->name
+        ], 200);
     }
 
 
-    /*
-    *   Get a car by id
-    *   @param Request $request
-    *   @return Response
-    */
-    public function getCarById(Request $request){
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:cars,id'
-        ]);
+    public function getCars()
+    {
+        $cars = Car::with(['categorie', 'brand'])->get();
         
-        if($validator->fails()){
+        return response()->json($cars->map(function ($car) {
+            return [
+                'id' => $car->id,
+                'name' => $car->name,
+                'year' => $car->year,
+                'color' => $car->color,
+                'price' => $car->price,
+                'chassisNumber' => $car->chassisNumber,
+                'description' => $car->description,
+                'category' => $car->categorie->name,
+                'brand' => $car->brand->name
+            ];
+        }), 200);
+    }
+
+
+    public function updateCar(Request $request)
+    {
+        $carId = $request->input('id');
+        $rules = array_merge(['id' => 'required|exists:cars,id'], $this->getCarValidationRules($carId));
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $car = Car::find($request->input('id'));
-        $car->categorie_id = $car->categorie->name;
-        $car->brand_id = $car->brand->name;
-
-        return response()->json($car, 200);
-    }
-
-
-    /*
-    *   Get all cars
-    *   @return Response
-    */
-    public function getCars(){
-        $cars = Car::all();
-        foreach($cars as $car){
-            $car->categorie_id = $car->categorie->name;
-            $car->brand_id = $car->brand->name;
+        try {
+            $car = Car::findOrFail($request->input('id'));
+            $car->update($request->only(self::CAR_FIELDS));
+            return response()->json(['message' => 'Car updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update car'], 500);
         }
-        return response()->json($cars, 200);
     }
 
 
-    /*
-    *   Update a car
-    *   @param Request $request
-    *   @return Response
-    */
-    public function updateCar(Request $request){
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:cars,id',
-            'name' => 'required|string|max:255',
-            'year' => 'required|integer|between:1900,' . date('Y'),
-            'color'=> 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'chassisNumber'=> 'required|unique:cars|max:32',
-            'description' => 'required|string|max:255',
-            'categorie_id' => 'required|exists:categories,id',
-            'brand_id' => 'required|exists:brands,id'
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $car = Car::find($request->input('id'));
-        $car->name = $request->input('name');
-        $car->year = $request->input('year');
-        $car->color = $request->input('color');
-        $car->price = $request->input('price');
-        $car->chassisNumber = $request->input('chassisNumber');
-        $car->description = $request->input('description');
-        $car->categorie_id = $request->input('categorie_id');
-        $car->brand_id = $request->input('brand_id');
-        $car->save();
-        return response()->json(['message' => 'Car updated successfully'], 200);
-    }
-
-
-    /*
-    *   Delete a car
-    *   @param Request $request
-    *   @return Response
-    */
-    public function deleteCar(Request $request){
+    public function deleteCar(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:cars,id'
         ]);
 
-        $car = Car::find($request->input('id'));
-        $car->delete();
-        return response()->json(['message' => 'Car deleted successfully'], 200);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            Car::findOrFail($request->input('id'))->delete();
+            return response()->json(['message' => 'Car deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete car'], 500);
+        }
     }
 
-    /*
-    *   Get car list by name
-    *   @param Request $request
-    *   @return Response
-    */
-    public function getCarByName(Request $request){
+    public function getCarByName(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255'
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cars = Car::where('name', 'like', '%' . $request->input('name') . '%')->get();
+        $validatedData = $validator->validated();
+        $cars = Car::with(['categorie', 'brand'])
+            ->where('name', 'like', '%' . $validatedData['name'] . '%')
+            ->get();
 
-        foreach($cars as $car){
-            $car->categorie_id = $car->categorie->name;
-            $car->brand_id = $car->brand->name;
-        }
-
-        return response()->json($cars, 200);
+        return response()->json($cars->map(function ($car) {
+            return [
+                'id' => $car->id,
+                'name' => $car->name,
+                'category' => $car->categorie->name,
+                'brand' => $car->brand->name
+            ];
+        }), 200);
     }
 }

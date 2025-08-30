@@ -10,11 +10,16 @@ class Achat extends Model
 {
     use HasFactory;
 
-    public function cars(): BelongsTo{
+    protected $table = 'achats';
+    protected $fillable = ['car_id', 'client_id'];
+
+    public function car(): BelongsTo
+    {
         return $this->belongsTo(Car::class);
     }
 
-    public function clients(): BelongsTo{
+    public function client(): BelongsTo
+    {
         return $this->belongsTo(Client::class);
     }
 }

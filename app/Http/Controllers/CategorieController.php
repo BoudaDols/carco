@@ -83,26 +83,27 @@ class CategorieController extends Controller
         }
     }
 
-    /*
-    *  Returns Car list by the given categorie
-    */
-    public function getCarsByCategorie(Request $request){
+    public function getCarsByCategorie(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|exists:categories|max:255',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $categorie = Categorie::where('name', $request->name)->first();
-        $cars = $categorie->cars;
+        $validatedData = $validator->validated();
+        $categorie = Categorie::where('name', $validatedData['name'])->firstOrFail();
+        $cars = $categorie->cars()->with('brand')->get();
 
-        foreach($cars as $car){
-            $car->categorie_id = $car->categorie->name;
-            $car->brand_id = $car->brand->name;
-        }
-
-        return response()->json($cars, 200);
+        return response()->json($cars->map(function ($car) use ($categorie) {
+            return [
+                'id' => $car->id,
+                'name' => $car->name,
+                'category' => $categorie->name,
+                'brand' => $car->brand->name
+            ];
+        }), 200);
     }
 }

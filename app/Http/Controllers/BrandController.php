@@ -14,7 +14,7 @@ class BrandController extends Controller
     */
     public function getBrands(){
         $brands = Brand::all();
-        return response()->json($brands);
+        return response()->json($brands, 200);
     }
 
     /*
@@ -73,26 +73,26 @@ class BrandController extends Controller
         return response()->json(['message' => 'Brand deleted successfully'], 200);
     }
 
-    /*
-    *  Returns Car list by the given brand
-    */
-    public function getCarsByBrand(Request $request){
+    public function getCarsByBrand(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|exists:brands|max:255',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $brand = Brand::where('name', $request->name)->first();
-        $cars = $brand->cars;
+        $brand = Brand::where('name', $request->name)->firstOrFail();
+        $cars = $brand->cars()->with('categorie')->get();
 
-        foreach($cars as $car){
-            $car->categorie_id = $car->categorie->name;
-            $car->brand_id = $car->brand->name;
-        }
-
-        return response()->json($cars, 200);
+        return response()->json($cars->map(function ($car) use ($brand) {
+            return [
+                'id' => $car->id,
+                'name' => $car->name,
+                'category' => $car->categorie->name,
+                'brand' => $brand->name
+            ];
+        }), 200);
     }
 }

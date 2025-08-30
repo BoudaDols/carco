@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 
@@ -30,12 +31,12 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => bcrypt($request->password),
-            'active'   => true,
-        ]);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->active = $request->input('active', config('auth.default_user_active', env('DEFAULT_USER_ACTIVE', false)));
+        $user->save();
 
         return response()->json(['message' => 'Utilisateur créé avec succès.'], 201);
     }
@@ -43,38 +44,58 @@ class AuthController extends Controller
     // Connexion
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email'    => 'required|email',
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        $validatedData = $validator->validated();
+        $user = User::where('email', $validatedData['email'])->first();
+
+        if (! $user || ! Hash::check($validatedData['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Identifiants incorrects.'],
             ]);
         }
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        if (! $user->active) {
+            throw ValidationException::withMessages([
+                'email' => ['Compte désactivé.'],
+            ]);
+        }
+
+        $token = $user->createToken(config('sanctum.token_name', env('SANCTUM_TOKEN_NAME', 'auth-token')))->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
-            'token_type'   => 'Bearer',
+            'token_type'   => config('sanctum.token_type', env('SANCTUM_TOKEN_TYPE', 'Bearer')),
         ]);
     }
 
     // Déconnexion
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()->currentAccessToken();
+        if ($token) {
+            $token->delete();
+        }
 
-        return response()->json(['message' => 'Déconnexion réussie.']);
+        return response()->json(['message' => 'Déconnexion réussie.'], 200);
     }
 
     // Données utilisateur connecté
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'active' => (bool) $user->active
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 }

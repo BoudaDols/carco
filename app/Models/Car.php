@@ -10,11 +10,19 @@ class Car extends Model
 {
     use HasFactory;
     
-    public function categorie(): BelongsTo{
+    protected $fillable = [
+        'name', 'year', 'color', 'price', 
+        'chassisNumber', 'description', 
+        'categorie_id', 'brand_id'
+    ];
+    
+    public function categorie(): BelongsTo
+    {
         return $this->belongsTo(Categorie::class);
     }
 
-    public function brand(): BelongsTo{
+    public function brand(): BelongsTo
+    {
         return $this->belongsTo(Brand::class);
     }
 }

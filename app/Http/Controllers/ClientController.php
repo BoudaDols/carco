@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Client;
 
 class ClientController extends Controller
 {
 
-    /*
-    *   Add a client
-    *   @param Request $request
-    *   @return Response
-    */
-    public function addClient(Request $request){
+    public function addClient(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'dateNaissance' => 'required|string|max:10',
@@ -21,17 +19,15 @@ class ClientController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $client = new Client();
-        $client->name = $request->input('name');
-        $client->dateNaissance = $request->input('dateNaissance');
-        $client->sexe = $request->input('sexe');
-        $client->domaineP = $request->input('domaineP');
-        $client->save();
-
-        return response()->json(['message' => 'Client added successfully'], 200);
+        try {
+            Client::create($request->only(['name', 'dateNaissance', 'sexe', 'domaineP']));
+            return response()->json(['message' => 'Client added successfully'], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create client'], 500);
+        }
     }
 
 
@@ -65,13 +61,8 @@ class ClientController extends Controller
     }
 
 
-
-    /*
-    *   Update a client
-    *   @param Request $request
-    *   @return Response
-    */
-    public function updateClient(Request $request){
+    public function updateClient(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|exists:clients,name',
             'dateNaissance' => 'required|string|max:10',
@@ -79,40 +70,46 @@ class ClientController extends Controller
             'domaineP' => 'required|string|max:25',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $client = Client::where('name', $request->input('name'))->first();
-
-        $client->dateNaissance = $request->input('dateNaissance');
-        $client->sexe = $request->input('sexe');
-        $client->domaineP = $request->input('domaineP');
-        $client->save();
-
-        return response()->json(['message' => 'Client updated successfully'], 200);
+        try {
+            $validatedData = $validator->validated();
+            $client = Client::where('name', $validatedData['name'])->firstOrFail();
+            $client->update([
+                'dateNaissance' => $validatedData['dateNaissance'],
+                'sexe' => $validatedData['sexe'],
+                'domaineP' => $validatedData['domaineP']
+            ]);
+            return response()->json(['message' => 'Client updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update client'], 500);
+        }
     }
 
-
-
     /*
-    *   Delete a client
+    *   Delete a client by name
     *   @param Request $request
     *   @return Response
     */
-    public function deleteClient(Request $request){
+    public function deleteClient(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'name' => 'required|exists:clients,name'
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $client = Client::where('name', $request->input('name'))->first();
-        $client->delete();
-
-        return response()->json(['message' => 'Client deleted successfully'], 200);
+        try {
+            $validatedData = $validator->validated();
+            Client::where('name', $validatedData['name'])->firstOrFail()->delete();
+            return response()->json(['message' => 'Client deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete client'], 500);
+        }
     }
     
 }
