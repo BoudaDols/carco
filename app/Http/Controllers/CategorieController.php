@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use App\Models\Categorie;
 use App\Models\Car;
 
@@ -25,6 +26,7 @@ class CategorieController extends Controller
         $categorie = new Categorie();
         $categorie->name = $request->input('name');
         $categorie->save();
+        Log::channel('api')->info('Category created', ['category_id' => $categorie->id, 'name' => $categorie->name]);
         return response()->json($categorie, 201);
     }
 
@@ -64,6 +66,7 @@ class CategorieController extends Controller
         if($categorie){
             $categorie->name = $request->input('name');
             $categorie->save();
+            Log::channel('api')->info('Category updated', ['category_id' => $categorie->id, 'name' => $categorie->name]);
             return response()->json($categorie, 200);
         }else{
             return response()->json(['message' => 'Categorie not found'], 404);
@@ -76,7 +79,9 @@ class CategorieController extends Controller
     public function deleteCategorie($id){
         $categorie = Categorie::find($id);
         if($categorie){
+            $categorieName = $categorie->name;
             $categorie->delete();
+            Log::channel('api')->info('Category deleted', ['category_id' => $id, 'name' => $categorieName]);
             return response()->json(['message' => 'Categorie deleted'], 200);
         }else{
             return response()->json(['message' => 'Categorie not found'], 404);

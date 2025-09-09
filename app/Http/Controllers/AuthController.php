@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 
@@ -37,6 +38,8 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         $user->active = $request->input('active', config('auth.default_user_active', env('DEFAULT_USER_ACTIVE', false)));
         $user->save();
+
+        Log::channel('auth')->info('User registered', ['user_id' => $user->id, 'email' => $user->email]);
 
         return response()->json(['message' => 'Utilisateur créé avec succès.'], 201);
     }
@@ -70,6 +73,8 @@ class AuthController extends Controller
 
         $token = $user->createToken(config('sanctum.token_name', env('SANCTUM_TOKEN_NAME', 'auth-token')))->plainTextToken;
 
+        Log::channel('auth')->info('User logged in', ['user_id' => $user->id, 'email' => $user->email]);
+
         return response()->json([
             'access_token' => $token,
             'token_type'   => config('sanctum.token_type', env('SANCTUM_TOKEN_TYPE', 'Bearer')),
@@ -83,6 +88,8 @@ class AuthController extends Controller
         if ($token) {
             $token->delete();
         }
+
+        Log::channel('auth')->info('User logged out', ['user_id' => $request->user()->id]);
 
         return response()->json(['message' => 'Déconnexion réussie.'], 200);
     }

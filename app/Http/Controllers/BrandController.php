@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Brand;
 use App\Models\Car;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class BrandController extends Controller
 {
@@ -35,6 +36,7 @@ class BrandController extends Controller
         $brand->name = $request->name;
         $brand->origin = $request->origin;
         $brand->save();
+        Log::channel('api')->info('Brand created', ['brand_id' => $brand->id, 'name' => $brand->name]);
         return response()->json($brand, 201);
     }
 
@@ -58,6 +60,7 @@ class BrandController extends Controller
         $brand->name = $request->name;
         $brand->origin = $request->origin;
         $brand->save();
+        Log::channel('api')->info('Brand updated', ['brand_id' => $brand->id, 'name' => $brand->name]);
         return response()->json($brand, 200);
     }
 
@@ -69,7 +72,9 @@ class BrandController extends Controller
         if(!$brand){
             return response()->json(['message' => 'Brand not found'], 404);
         }
+        $brandName = $brand->name;
         $brand->delete();
+        Log::channel('api')->info('Brand deleted', ['brand_id' => $id, 'name' => $brandName]);
         return response()->json(['message' => 'Brand deleted successfully'], 200);
     }
 

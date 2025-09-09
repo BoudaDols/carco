@@ -6,6 +6,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LogController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +20,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
-
+        Route::get('/logs', [LogController::class, 'index']);
     });
 
 
@@ -55,4 +56,6 @@ Route::prefix('auth')->group(function () {
 Route::get('/', function(){
     return response()->json(['message' => 'Welcome to the API CarCo!']);
 });
+
+
 

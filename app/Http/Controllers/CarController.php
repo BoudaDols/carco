@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use App\Models\Car;
 
 class CarController extends Controller
@@ -39,9 +40,11 @@ class CarController extends Controller
         }
 
         try {
-            Car::create($request->only(self::CAR_FIELDS));
+            $car = Car::create($request->only(self::CAR_FIELDS));
+            Log::channel('cars')->info('Car created', ['car_id' => $car->id, 'name' => $car->name]);
             return response()->json(['message' => 'Car added successfully'], 201);
         } catch (\Exception $e) {
+            Log::channel('cars')->error('Failed to create car', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to create car'], 500);
         }
     }
@@ -98,8 +101,10 @@ class CarController extends Controller
         try {
             $car = Car::findOrFail($request->input('id'));
             $car->update($request->only(self::CAR_FIELDS));
+            Log::channel('cars')->info('Car updated', ['car_id' => $car->id, 'name' => $car->name]);
             return response()->json(['message' => 'Car updated successfully'], 200);
         } catch (\Exception $e) {
+            Log::channel('cars')->error('Failed to update car', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to update car'], 500);
         }
     }
@@ -116,9 +121,13 @@ class CarController extends Controller
         }
 
         try {
-            Car::findOrFail($request->input('id'))->delete();
+            $car = Car::findOrFail($request->input('id'));
+            $carName = $car->name;
+            $car->delete();
+            Log::channel('cars')->info('Car deleted', ['car_id' => $request->input('id'), 'name' => $carName]);
             return response()->json(['message' => 'Car deleted successfully'], 200);
         } catch (\Exception $e) {
+            Log::channel('cars')->error('Failed to delete car', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to delete car'], 500);
         }
     }
